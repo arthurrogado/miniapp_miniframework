@@ -1,0 +1,10 @@
+BOT_TOKEN = '12345678910:AAAAAAAAAAAAAAAAAAAAAAAAAAAA' # arreisbot test
+
+# Database
+DB_NAME = 'App/Database/database.db'
+
+# Cloud to save anything
+CLOUD_ID = '-100xxxxxxxx' # New cloud group
+
+# Admin
+ADMIN_ID = ''
