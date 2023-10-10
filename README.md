@@ -68,10 +68,10 @@ Having this in mind, you can look at the code and understand how webapp have dat
     ├───Utils/
     └── bot.py
 
-- Components: contains different menus. Like main_menu.py contains a MainMenu class, that is responsible to show the main menu and handle its commands; get_my_drawings.py > GetMyDrawings class: get drawings from user from database, organize into a object like data, and send this stringfied data to webapp by markup_webapp_button() function (App/Utils/markups.py).
+- Components: contains different menus. Like main_menu.py contains a MainMenu class, that is responsible to show the main menu and handle its commands; get_user_info.py > GetUserInfo class: get user information from database, organize into a object like data, and send this stringfied data to webapp by markup_webapp_button() function (App/Utils/markups.py).
 - Config: contains config.py file, that contains sensitive data like bot token.
 - Database: contains database.py file, that holds DB class, and is responsible to connect to database and execute queries. There are also some common methods to execute CRUD.
-    - Like "model" in MVC, Draw.py, fro example, contains a Draw class, that is responsible to hold data from a draw, and also to execute CRUD operations related to a draw.
+    - Like "model" in MVC, users.py, for example, contains a User class, that is responsible to hold data from a users, and also to execute CRUD operations related to a user.
 - Utils: 
     - funcitons.py: some common functions that can be used in any part of the code, like dict_to_url_params().
     - markups.py: contains functions to create markups (like keyboard or inline buttons) to be used in bot messages, as well a function to create a keyboard button that will send data to webapp (or open a webapp with custom data).
