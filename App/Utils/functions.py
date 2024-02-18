@@ -1,4 +1,4 @@
-from constants import ADMIN_ID
+from App.Utils.constants import ADMIN_ID
 from urllib.parse import urlparse
 
 def is_admin(userid):

@@ -9,7 +9,7 @@ class OtherMenu(BaseComponent):
         self.bot = bot
         self.userid = userid
 
-        self.start()
+        # self.start() # can be omitted because it's called in the parent class (BaseComponent)
 
     def start(self):
         msg = self.bot.send_message(self.userid, "*OTHER MENU\!*", parse_mode='MarkdownV2', reply_markup=generate_keyboard([['Hello other!']]))
@@ -18,3 +18,4 @@ class OtherMenu(BaseComponent):
     def handle(self, msg):
         self.bot.send_message(self.userid, "Hello another!", reply_markup=clearKeyboard())
         # clear keyboard markup
+        self.bot.clear_step_handler_by_chat_id(self.userid)

@@ -93,13 +93,14 @@ def receber(msg: Message):
 
 
 # CALLBACKS
-@bot.callback_query_handler(func=lambda call: call.data.startswith('*') == False)
+@bot.callback_query_handler(func=lambda call: call.data.startswith('*') == False) # call_data starting with * is for components
 def callback(call):
     userid = call.from_user.id
     data = call.data
 
     options = {
         'hello': lambda: bot.answer_callback_query(call.id, f'Olá {call.from_user.first_name}'),
+        'start_from_here': lambda: MainMenu(bot, userid, call, MainMenu.start_from_here)
     }
 
     if data in options:
