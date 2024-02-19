@@ -77,32 +77,7 @@ Having this in mind, you can look at the code and understand how webapp have dat
     - markups.py: contains functions to create markups (like keyboard or inline buttons) to be used in bot messages, as well a function to create a keyboard button that will send data to webapp (or open a webapp with custom data).
     - constants.py: contains some constants that can be used in any part of the code, like WEBAPP_URL, CLOUD_ID, etc.
 
-### Understanding client "miniframework"
-
-- app.js: contains the main code to run webapp.
-
-Navigation in webapp is basically done by changing the content of main tag with the result from fetching defined routes (html, css and js files). This is done by the function navigateTo(). You can look at inside this functions and understand how it works with the help of comments. But basically:
-
-1. navigateTo():
-    - push the current route into history (to be able to go back), and enables mini app back button.
-    - calls router() function.
-
-2. router():
-    - set routes, than process window url and fetch for component in the route with loadRoute().
-
-3. loadRoute():
-    - fetch for html, css and js files, and append them into main tag.
-
-All pages must be in /pages folder, and must have the same name (like /pages/home.html, /pages/home.css, /pages/home.js). This is because loadRoute() function will look for these files in this way.
-
-## License
-This project is licensed under the MIT license. See the LICENSE file for more information.
-
-
-
-
-
-## Basic structure
+## Basic structure on bot.py
 - Imports
     - Here we import the necessary libraries, models, types, and Components.
 
@@ -129,3 +104,23 @@ This project is licensed under the MIT license. See the LICENSE file for more in
     - call (CallbackQuery): the previous callback query that called the component, if any. It's used to edit the message, for example. Just a reference.
     - startFrom: method reference to start the component. It's the first method that will be called when the component is called. It's for the case when you want to start the component from a specific point, not from the beginning, like when you want to edit a message and start the component from the last step.
 
+### Understanding client "miniframework"
+
+- app.js: contains the main code to run webapp.
+
+Navigation in webapp is basically done by changing the content of main tag with the result from fetching defined routes (html, css and js files). This is done by the function navigateTo(). You can look at inside this functions and understand how it works with the help of comments. But basically:
+
+1. navigateTo():
+    - push the current route into history (to be able to go back), and enables mini app back button.
+    - calls router() function.
+
+2. router():
+    - set routes, than process window url and fetch for component in the route with loadRoute().
+
+3. loadRoute():
+    - fetch for html, css and js files, and append them into main tag.
+
+All pages must be in /pages folder, and must have the same name (like /pages/home.html, /pages/home.css, /pages/home.js). This is because loadRoute() function will look for these files in this way.
+
+## License
+This project is licensed under the MIT license. See the LICENSE file for more information.

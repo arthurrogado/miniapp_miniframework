@@ -7,11 +7,6 @@ from ..Database.database import DB
 
 class BaseComponent():
     markup_cancel = markups.generate_inline([[['❌ Cancel', '*cancel']]])
-    
-    # def __init__(self, bot: TeleBot, userid) -> None:
-    #     self.bot = bot
-    #     self.userid = userid
-    #     self.db = DB(self.bot)
 
     def __init__(self, bot: CustomBot, userid, call: CallbackQuery = None, startFrom = None) -> None:
         self.bot = bot
