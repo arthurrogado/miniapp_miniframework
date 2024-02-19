@@ -77,7 +77,7 @@ Having this in mind, you can look at the code and understand how webapp have dat
     - markups.py: contains functions to create markups (like keyboard or inline buttons) to be used in bot messages, as well a function to create a keyboard button that will send data to webapp (or open a webapp with custom data).
     - constants.py: contains some constants that can be used in any part of the code, like WEBAPP_URL, CLOUD_ID, etc.
 
-## Basic structure on bot.py
+#### Basic structure on bot.py
 - Imports
     - Here we import the necessary libraries, models, types, and Components.
 
