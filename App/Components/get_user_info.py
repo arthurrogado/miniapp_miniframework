@@ -1,8 +1,8 @@
 from telebot import TeleBot
-from App.Components.__component import BaseComponent
+from App.Components.BaseComponent import BaseComponent
 from App.Database.users import User
-from App.Utils.constants import URL_HOME
-from App.Utils.markups import markup_webapp_button
+from App.Config import URL_HOME
+from App.Utils.Markup import markup_webapp_button
 
 class GetUserInfo(BaseComponent):
     def __init__(self, bot: TeleBot, userid) -> None:

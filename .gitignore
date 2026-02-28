@@ -2,3 +2,4 @@ config.py
 database.db
 venv/
 __pycache__/
+secrets.py
