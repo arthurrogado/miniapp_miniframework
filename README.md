@@ -1,126 +1,174 @@
-# MiniApp miniframework for Telegram Bot
-This is a concept of how to develop a miniapp with minimal organization.
+# MiniApp MiniFramework — Telegram Bot
 
-Learn as a developer:
-- How to integrate a Telegram Bot with a Telegram Mini App (webapp)
-- Miniframework for server and client side (see this [template](https://github.com/arthurrogado/miniframework_miniapp/): )
-    - Server side: python bot with pyTelegramBotAPI, as well as a simple CRUD and a miniframework (organize your code in a simple but strong way, using modules and classes, placing your code in the right place)
-    - Client side: vanilla javascript, in a very simple "miniframework" to develop a SPA (Single Page Application) like app.
+Template/miniframework para bots Telegram com **pyTelegramBotAPI**, arquitetura component-based e suporte opcional a **Pyrogram** para operações pesadas.
 
-## How to use (setup step-by-step)
+Inclui também um mini-framework client-side (vanilla JS SPA) para Telegram Mini Apps.
 
-### 1. Deploy webapp directory into a web server or run it locally and use some tunnel service like ngrok to make it https.
+## Stack
 
-- 1.1. Ngrok like:
-    - to run a localhost server, you can use the following command at webapp directory: `python -m http.server 8080` (change 8080 to the port that you want to use)
-    - you can use the following command: `ngrok http 8080` (change 8080 to the port that you are using)
-    - it will generate a https url, that you can use to configure your bot.
+| Camada | Tecnologia | Descrição |
+|---|---|---|
+| Bot principal | pyTelegramBotAPI (TeleBot) | Handlers, menus, callbacks, inline queries |
+| Bot secundário | Pyrogram (opcional) | Upload de arquivos grandes, operações async |
+| Database | SQLite | Persistência via classes DAO |
+| Frontend | Vanilla JS | SPA para Telegram Mini Apps (WebApps) |
 
-or
+## Estrutura do projeto
 
-- 1.2. Netlify like:
-    - create a account at https://app.netlify.com/
-    - upload into netlify and it will generate a https url, that you can use to configure your bot.
+```
+├── bot.py                  # Entry point — handlers, automatic_run, startup
+├── admin_runtime.py        # Thread dedicada Pyrogram (opcional)
+├── singleton.py            # Template singleton thread-safe
+├── App/
+│   ├── custom_bot.py       # CustomBot (extends TeleBot) — handler tracking, message editing
+│   ├── Components/
+│   │   ├── BaseComponent.py    # Classe base para todos os componentes
+│   │   ├── main_menu.py        # Menu principal
+│   │   ├── Queries.py          # Inline queries (dispatch por prefixo)
+│   │   └── ...                 # Seus componentes
+│   ├── Core/
+│   │   ├── Exceptions.py       # SilentException
+│   │   ├── Messages.py         # Mensagens padrão
+│   │   ├── PermissionMiddleware.py  # Guard de admin
+│   │   └── RateLimit.py        # Token-bucket por usuário/tipo
+│   ├── Config/
+│   │   ├── config.py           # Configurações gerais
+│   │   └── secrets.py          # Tokens e chaves (gitignored)
+│   ├── Database/
+│   │   ├── DB.py               # Base DAO (SQLite)
+│   │   └── users.py            # DAO de usuários
+│   └── Utils/
+│       ├── Markup.py           # Builder de teclados inline/reply
+│       └── utils.py            # Helpers (deep links, admin check, etc.)
+└── webapp/
+    ├── app.js              # Router SPA
+    ├── index.html          # Shell
+    └── pages/              # Páginas (html + css + js)
+```
 
-or
+## Setup
 
-- 1.3. Use our webapp used in this project:
-    - Look at details for contest section above and use the webapp url.
+### 1. Bot
 
-### 2. Setting variables to the bot:
-- 2.1. Paste the webapp url into the file `App/Utils/Constants.py` (WEBAPP_URL variable)
+```bash
+# Criar e ativar venv
+python -m venv venv
+source venv/bin/activate  # Linux/WSL
+# ou: .\venv\Scripts\Activate.ps1  # Windows
 
-- 2.2. Create a Telegram Bot using [BotFather](https://t.me/botfather)
+# Instalar dependências
+pip install pyTelegramBotAPI
+# Opcional (para Pyrogram):
+pip install pyrogram tgcrypto
+```
 
-    - 2.2.1 Create a bot using BotFather (https://t.me/botfather)
-        > /newbot > choose a name (anyone) > choose a username (unique and must end with 'bot')
-    - 2.2.2 Copy the bot token
-    - 2.2.3. Paste the bot token into the file `App/Config/config.py` (BOT_TOKEN variable)
+### 2. Configuração
 
-- 2.3. Create a Telegram Group or Channel and add its id into `App/Utils/Constants.py` (CLOUD_ID variable)
-    - 2.3.1. Remember to add the bot into the group or channel
+1. Criar bot via [BotFather](https://t.me/botfather) e copiar o token
+2. Copiar `App/Config/secrets.py.example` para `App/Config/secrets.py`
+3. Preencher `BOT_TOKEN` em `secrets.py`
+4. (Opcional) Preencher `API_ID`, `API_HASH`, `ADMIN_BOT_TOKEN` para Pyrogram
+5. Configurar `ADMINS_IDS` em `App/Config/config.py`
 
-### 3. Run the bot 
-- Make sure pyTelegramBotAPI is installed with `pip install pyTelegramBotAPI`
-- Using the following command at top directory: `python -m bot.py`
+### 3. WebApp (Mini App)
 
+A webapp precisa estar acessível via HTTPS:
 
+- **Local**: `python -m http.server 8080` + `ngrok http 8080`
+- **Deploy**: Qualquer hosting estático (Netlify, Vercel, GitHub Pages)
 
-## Understanding the code and some concepts
+Configurar a URL da webapp em `App/Config/config.py`.
 
-- Telegram bot will be responsible to receive commands (directly by user or by the webapp) and send messages to the user.
-- Telegram webapp will be responsible only to receive data from bot and use it to show to the user anything that is needed.
-- **COMUNICATION**:
-    - Bot will send data via GET (query string in url) to the webapp. In our case it's sent in a stringified JSON format.
-    - Mini App will send data via sendData() function, and bot receives as a user special type of message:
-`@bot.message_handler(content_types="web_app_data")
-    def answer(msg):`
-        - Note that answer() function is called when bot receives a message that fits in filter (content_types="web_app_data")
+### 4. Executar
 
-Having this in mind, you can look at the code and understand how webapp have data from bot and how bot have data from webapp.
+```bash
+python bot.py
+```
 
-### Understanding server miniframework
+## Arquitetura
 
-    C:.
-    ├───Components/
-    ├───Config/
-    ├───Database/
-    ├───Utils/
-    └── bot.py
+### Roteamento dinâmico (`automatic_run`)
 
-- Components: contains different menus. Like main_menu.py contains a MainMenu class, that is responsible to show the main menu and handle its commands; get_user_info.py > GetUserInfo class: get user information from database, organize into a object like data, and send this stringfied data to webapp by markup_webapp_button() function (App/Utils/markups.py).
-- Config: contains config.py file, that contains sensitive data like bot token.
-- Database: contains database.py file, that holds DB class, and is responsible to connect to database and execute queries. There are also some common methods to execute CRUD.
-    - Like "model" in MVC, users.py, for example, contains a User class, that is responsible to hold data from a users, and also to execute CRUD operations related to a user.
-- Utils: 
-    - funcitons.py: some common functions that can be used in any part of the code, like dict_to_url_params().
-    - markups.py: contains functions to create markups (like keyboard or inline buttons) to be used in bot messages, as well a function to create a keyboard button that will send data to webapp (or open a webapp with custom data).
-    - constants.py: contains some constants that can be used in any part of the code, like WEBAPP_URL, CLOUD_ID, etc.
+Todo o fluxo de navegação usa um roteador que resolve `callback_data → classe.método(*args)`:
 
-#### Basic structure on bot.py
-- Imports
-    - Here we import the necessary libraries, models, types, and Components.
+```
+Classe__metodo__arg1__arg2
+Pasta_Classe__metodo__arg1
+```
 
-- basic_comands
-    - Here we define the basic commands that the bot will have. You can add more commands and rules, like custom commands for different types of users.
+- `__` separa classe, método e parâmetros
+- `_` no caminho = separador de diretório
+- 3 entry points: deep links (`/start param`), callbacks e comandos texto
 
-- Webapp messages handler
-    - Here you can define actions for webapp_data, sent by the user in json format.
-    - Action can be a lambda function that runs a Component or any function.
+### Componentes
 
-- Any message handler
-    - You can set a handler for any message, as well as for any command. Here it's generally used for the custom commands and MainMenu component.
+Cada feature/tela é uma classe que herda `BaseComponent`:
 
-- Callbacks
-    - Here you register all the callbacks that the bot will have. You can do this inside components, but it's better to have a centralized place for this, and you avoid losing track of the callbacks when the project grows and restart your bot.
-    - Basically you define a dict options, where the key is the callback_data and the value is a lambda function that runs a Component.
+```python
+from App.Components.BaseComponent import BaseComponent
+from App.Utils import Markup
 
-- COMPONENTS
-    
-    Components can be called passing this instructions (from App.custom_bot.CustomBot):
+class MeuComponente(BaseComponent):
+    def __init__(self, bot, userid, call=None):
+        super().__init__(bot, userid, call)
 
-    - bot: the main instance of the bot running.
-    - userid: the user id that is running the component.
-    - call (CallbackQuery): the previous callback query that called the component, if any. It's used to edit the message, for example. Just a reference.
-    - startFrom: method reference to start the component. It's the first method that will be called when the component is called. It's for the case when you want to start the component from a specific point, not from the beginning, like when you want to edit a message and start the component from the last step.
+    def start(self):
+        markup = Markup.generate_inline([
+            [['Opção 1', 'MeuComponente__acao1']],
+            [['Opção 2', 'MeuComponente__acao2__param']],
+        ])
+        self.bot.send_message(self.userid, "Escolha:", reply_markup=markup)
 
-### Understanding client "miniframework"
+    def acao1(self):
+        self.bot.send_message(self.userid, "Ação 1!")
+```
 
-- app.js: contains the main code to run webapp.
+### Core
 
-Navigation in webapp is basically done by changing the content of main tag with the result from fetching defined routes (html, css and js files). This is done by the function navigateTo(). You can look at inside this functions and understand how it works with the help of comments. But basically:
+- **SilentException** — Interrompe fluxo sem mostrar erro genérico
+- **PermissionMiddleware** — `self.permission.check_is_admin()` em métodos admin-only
+- **RateLimit** — Token-bucket por usuário e tipo (command/callback/inline)
+- **Messages** — Constantes de mensagem padronizadas
 
-1. navigateTo():
-    - push the current route into history (to be able to go back), and enables mini app back button.
-    - calls router() function.
+### Database
 
-2. router():
-    - set routes, than process window url and fetch for component in the route with loadRoute().
+1 classe DAO por tabela, herda `DB`:
 
-3. loadRoute():
-    - fetch for html, css and js files, and append them into main tag.
+```python
+from App.Database.DB import DB
 
-All pages must be in /pages folder, and must have the same name (like /pages/home.html, /pages/home.css, /pages/home.js). This is because loadRoute() function will look for these files in this way.
+class Produto(DB):
+    def criar(self, nome, preco):
+        return self.insert('produtos', {'nome': nome, 'preco': preco})
+
+    def buscar(self, id):
+        return self.select_one('produtos', ['*'], 'id = ?', params=[id])
+```
+
+### Pyrogram (opcional)
+
+Para operações que excedem os limites da Bot API (upload >50MB, etc.):
+
+1. Configurar `USE_PYROGRAM = True` em `config.py`
+2. Preencher credenciais em `secrets.py`
+3. O `admin_runtime.py` cria thread dedicada com event loop próprio
+4. Usar `submit_coro()` para agendar coroutines do Pyrogram a partir de handlers sync
+
+### WebApp (Mini App)
+
+SPA em vanilla JS com router baseado em `history.pushState`:
+
+- `navigateTo(route)` — Push route + fetch HTML/CSS/JS da página
+- Páginas em `webapp/pages/<nome>/<nome>.{html,css,js}`
+- Comunicação: Bot → WebApp via query string na URL; WebApp → Bot via `sendData()`
+
+## Skills
+
+O projeto inclui skills para Claude/Copilot em `.github/skills/`:
+
+- **pytelegrambot-dev** — Guia completo de componentes, routing, Markup, DB, inline queries, wizards, picklist, frontend
+- **singleton-userbot** — Singleton thread-safe, integração Pyrogram, pipeline de processamento async
 
 ## License
-This project is licensed under the MIT license. See the LICENSE file for more information.
+
+MIT — ver [LICENCE](LICENCE).
