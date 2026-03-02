@@ -43,5 +43,11 @@ class BaseComponent():
         self.bot.clear_registered_callback_handlers_by_chat_id(chat_id)
 
     def set_callback_query_handler(self, handler_function, call_data):
-        """Registra handler de callback privado (prefixo _ no call_data)."""
-        self.bot.register_callback_query_handler(handler_function, lambda call: call.data == call_data)
+        """Registra handler de callback privado (prefixo _ no call_data).
+        
+        Usa once_callback_query_handler para escopo por chat_id e auto-remoção."""
+        self.bot.once_callback_query_handler(
+            self.userid,
+            handler_function,
+            filter=lambda call: call.data == call_data
+        )
