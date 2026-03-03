@@ -213,6 +213,7 @@ Callbacks com subpastas usam `_` como separador de diretório:
 6. Sempre botão Voltar/Cancelar em fluxos multi-etapas
 7. Após completar ação, retornar ao menu de origem (nunca deixar o usuário "solto")
 8. Cache de módulos importados em `module_cache` (dict global) para evitar re-imports
+9. Não fazer imports relativos entre componentes — usar import absoluto (Exemplo: `from App.Database.user import User`, isto é, não importar User direto de Database e sim de Database.user)
 
 ## Referências detalhadas
 
